@@ -1,7 +1,9 @@
 <?php 
 
+use Workflow\Controller\ConfigController;
 use Workflow\Controller\IndexController;
 use Workflow\Controller\WorkflowController;
+use Workflow\Controller\Factory\ConfigControllerFactory;
 use Workflow\Controller\Factory\IndexControllerFactory;
 use Workflow\Controller\Factory\WorkflowControllerFactory;
 use Workflow\Form\WorkflowForm;
@@ -25,6 +27,17 @@ return [
                 ],
                 'may_terminate' => FALSE,
                 'child_routes' => [
+                    'config' => [
+                        'type' => Segment::class,
+                        'priority' => 100,
+                        'options' => [
+                            'route' => '/config[/:action]',
+                            'defaults' => [
+                                'action' => 'index',
+                                'controller' => ConfigController::class,
+                            ],
+                        ],
+                    ],
                     'default' => [
                         'type' => Segment::class,
                         'priority' => -100,
@@ -44,6 +57,7 @@ return [
         'factories' => [
             IndexController::class => IndexControllerFactory::class,
             WorkflowController::class => WorkflowControllerFactory::class,
+            ConfigController::class => ConfigControllerFactory::class,
         ],
     ],
     'form_elements' => [
@@ -63,8 +77,13 @@ return [
                         'route' => 'workflows/default',
                         'action' => 'create',
                     ],
+                    [
+                        'label' => 'Settings',
+                        'route' => 'workflows/config',
+                    ],
                 ],
-            ]
+            ],
+            
         ],
     ],
     'service_manager' => [

@@ -52,5 +52,24 @@ class ConfigController extends AbstractConfigController
         $ddl->addConstraint(new PrimaryKey('UUID'));
         
         $this->adapter->query($sql->buildSqlString($ddl), $this->adapter::QUERY_MODE_EXECUTE);
+        unset($ddl);
+        
+        /******************************
+         * WORKFLOW STATES
+         ******************************/
+        $ddl = new CreateTable('workflow-states');
+        
+        $ddl->addColumn(new Varchar('UUID', 36));
+        $ddl->addColumn(new Integer('STATUS', TRUE));
+        $ddl->addColumn(new Datetime('DATE_CREATED', TRUE));
+        $ddl->addColumn(new Datetime('DATE_MODIFIED', TRUE));
+        
+        $ddl->addConstraint(new PrimaryKey('UUID'));
+        
+        $ddl->addColumn(new Varchar('STATE', 255));
+        
+        $this->adapter->query($sql->buildSqlString($ddl), $this->adapter::QUERY_MODE_EXECUTE);
+        unset($ddl);
+        
     }
 }

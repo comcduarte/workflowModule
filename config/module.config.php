@@ -3,14 +3,17 @@
 use Workflow\Controller\ConfigController;
 use Workflow\Controller\IndexController;
 use Workflow\Controller\WorkflowController;
+use Workflow\Controller\WorkflowMaintenanceController;
 use Workflow\Controller\Factory\ConfigControllerFactory;
 use Workflow\Controller\Factory\IndexControllerFactory;
 use Workflow\Controller\Factory\WorkflowControllerFactory;
+use Workflow\Controller\Factory\WorkflowMaintenanceControllerFactory;
 use Workflow\Form\WorkflowForm;
 use Workflow\Form\Factory\WorkflowFormFactory;
 use Workflow\Service\Factory\WorkflowModelPrimaryAdapterFactory;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
+use Workflow\Form\WorkflowStateForm;
 
 return [
     'router' => [
@@ -38,6 +41,40 @@ return [
                             ],
                         ],
                     ],
+                    'maintenance' => [
+                        'type' => Segment::class,
+                        'priority' => 90,
+                        'options' => [
+                            'route' => '/maintenance[/:action]',
+                            'defaults' => [
+                                'controller' => WorkflowMaintenanceController::class,
+                            ],
+                        ],
+                        'child_routes' => [
+                            'workflows' => [
+                                'type' => Literal::class,
+                                'priority' => 100,
+                                'options' => [
+                                    'route' => '/workflows',
+                                    'defaults' => [
+                                        'model' => WorkflowModel::class,
+                                        'form' => WorkflowForm::class,
+                                    ],
+                                ],
+                            ],
+                            'workflow-states' => [
+                                'type' => Literal::class,
+                                'priority' => 100,
+                                'options' => [
+                                    'route' => '/workflow-states',
+                                    'defaults' => [
+                                        'model' => WorkflowStateModel::class,
+                                        'form' => WorkflowStateForm::class,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                     'default' => [
                         'type' => Segment::class,
                         'priority' => -100,
@@ -55,9 +92,10 @@ return [
     ],
     'controllers' => [
         'factories' => [
+            ConfigController::class => ConfigControllerFactory::class,
             IndexController::class => IndexControllerFactory::class,
             WorkflowController::class => WorkflowControllerFactory::class,
-            ConfigController::class => ConfigControllerFactory::class,
+            WorkflowMaintenanceController::class => WorkflowMaintenanceControllerFactory::class,
         ],
     ],
     'form_elements' => [
@@ -73,9 +111,38 @@ return [
                 'class' => 'dropdown',
                 'pages' => [
                     [
-                        'label' => 'Create new Workflow',
+                        'label' => 'Workflows',
                         'route' => 'workflows/default',
-                        'action' => 'create',
+                        'class' => 'dropdown-submenu',
+                        'pages' => [
+                            [
+                                'label' => 'Add Workflows',
+                                'route' => 'workflows/maintenance/workflows',
+                                'action' => 'create',
+                            ],
+                            [
+                                'label' => 'View Workflows',
+                                'route' => 'workflows/maintenance/workflows',
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                    [
+                        'label' => 'Workflow States',
+                        'route' => 'workflows/default',
+                        'class' => 'dropdown-submenu',
+                        'pages' => [
+                            [
+                                'label' => 'Add Workflow State',
+                                'route' => 'workflows/maintenance/workflow-states',
+                                'action' => 'create',
+                            ],
+                            [
+                                'label' => 'View Workflow States',
+                                'route' => 'workflows/maintenance/workflow-states',
+                                'action' => 'index',
+                            ],
+                        ],
                     ],
                     [
                         'label' => 'Settings',
@@ -83,7 +150,6 @@ return [
                     ],
                 ],
             ],
-            
         ],
     ],
     'service_manager' => [

@@ -5,5 +5,5 @@ use Midnet\Controller\AbstractBaseController;
 
 class WorkflowController extends AbstractBaseController
 {
-    
+
 }
